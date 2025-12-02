@@ -1,0 +1,221 @@
+@charset "UTF-8";
+
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-image: url("background.jpg/img.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding-top: 70px;
+  overflow-x: hidden;
+}
+
+/* ---------------------------------------------------------------
+   FIXED HEADER
+--------------------------------------------------------------- */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #003366;
+  color: white;
+  padding: 15px 25px;
+  width: 100%;
+  font-size: 22px;
+  font-weight: bold;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  animation: slideDown 1s ease-out;
+  z-index: 10;
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-50px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* ---------------------------------------------------------------
+   MAIN AREA
+--------------------------------------------------------------- */
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+}
+
+/* ---------------------------------------------------------------
+   SLIDE-LEFT HEADING
+--------------------------------------------------------------- */
+h1 {
+  color: white;
+  font-size: 40px;
+  margin-bottom: 25px;
+  text-shadow: 3px 3px 10px rgba(0,0,0,0.4);
+  opacity: 0;
+  transform: translateX(-80px);
+  animation: slideLeft 1.3s ease-out forwards;
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(-80px); opacity: 0; }
+  to   { transform: translateX(0); opacity: 1; }
+}
+
+/* ---------------------------------------------------------------
+   GLASS + BLUR STYLE + 3D TILT FORM
+--------------------------------------------------------------- */
+form {
+  width: 360px;
+  padding: 30px;
+  border-radius: 20px;
+
+  /* Glass effect */
+  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.35);
+
+  /* Gloss + Shadows */
+  box-shadow: 
+      0 0 25px rgba(255,255,255,0.3),
+      inset 0 0 25px rgba(255,255,255,0.1);
+
+  /* Animations */
+  animation: tilt 6s infinite ease-in-out alternate,
+             fadeForm 1.4s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes fadeForm {
+  from { opacity: 0; transform: translateY(40px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tilt {
+  0%   { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(4deg) rotateY(-4deg); }
+}
+
+/* ---------------------------------------------------------------
+   FORM GROUPS + INPUTS
+--------------------------------------------------------------- */
+.form-group {
+  margin-bottom: 20px;
+  animation: fadeInputs 1.4s ease-out;
+}
+
+@keyframes fadeInputs {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+label {
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 6px;
+  display: block;
+}
+
+input[type="text"],
+input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.7);
+  outline: none;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  transition: 0.3s;
+}
+
+input:focus {
+  border-bottom: 3px solid #00aaff;
+  box-shadow: 0 0 12px #00aaff;
+  background: rgba(255,255,255,0.95);
+}
+
+/* ---------------------------------------------------------------
+   FORGOT PASSWORD LINK (optional)
+--------------------------------------------------------------- */
+.forgot-container {
+  text-align: right;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.forgot-container a {
+  color: #003366;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.forgot-container a:hover {
+  text-decoration: underline;
+  color: #005bb5;
+}
+
+/* ---------------------------------------------------------------
+   BUTTONS WITH SHIMMER & HOVER EFFECT
+--------------------------------------------------------------- */
+input[type="submit"],
+input[type="reset"] {
+  background: linear-gradient(90deg,#003366,#005bb5);
+  color: white;
+  padding: 12px 30px;
+  border-radius: 7px;
+  cursor: pointer;
+  margin: 6px;
+  font-size: 18px;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: 0.4s;
+}
+
+input[type="submit"]::after,
+input[type="reset"]::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.65), transparent);
+  transition: 0.7s;
+}
+
+input[type="submit"]:hover::after,
+input[type="reset"]:hover::after {
+  left: 100%;
+}
+
+input[type="submit"]:hover,
+input[type="reset"]:hover {
+  transform: translateY(-4px) scale(1.06);
+  box-shadow: 0 0 18px rgba(255,255,255,0.9);
+}
+
+/* ---------------------------------------------------------------
+   FIXED FOOTER
+--------------------------------------------------------------- */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #002b5c;
+  color: white;
+  text-align: center;
+  padding: 12px 0;
+  font-size: 14px;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+}

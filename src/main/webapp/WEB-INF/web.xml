@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app>
+	<display-name>Project</display-name>
+	<welcome-file-list>
+		<welcome-file>WelcomePage.html</welcome-file>
+		
+	</welcome-file-list>
+</web-app>

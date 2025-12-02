@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+ 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      position: relative;
+      background-image:url('https://wpblogassets.paytm.com/paytmblog/uploads/2021/07/ATM_8_WhatIsAnATMCardAndHowToUseIt-1-800x500.jpg');
+      background-repeat:norepeat;
+      background-size:cover;
+    }
+     header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+	  top: 0;
+      left: 0;
+      padding: 20px; 
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 10;
+    }
+     header img {
+      width: 80px; /* adjust logo size */
+      height: auto;
+      margin-right: 4px;
+    }
+
+    header h1 {
+      font-size: 48px;
+      color: #004C8F; /* HDFC Blue */
+      margin: 0;
+    }
+
+    header h1 span {
+      color: #E61C23; /* HDFC Red */
+    }
+    .rightside-button-container,
+    .leftside-button-container {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .rightside-button-container {
+      right: 10px;
+    }
+
+    .leftside-button-container {
+      left: 10px;
+    }
+
+    .side {
+      width: 200px;
+      height: 60px;
+      background: linear-gradient(145deg, #d4d4d4, #9e9e9e);
+      border: 2px solid #333;
+      border-radius: 50px;
+      box-shadow: inset 2px 2px 5px #fff, inset -2px -2px 5px #555,
+                  0 4px 10px rgba(0,0,0,0.5);
+      color: black;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+
+    .side:active {
+      box-shadow: inset -2px -2px 5px #fff, inset 2px 2px 5px #555;
+      transform: scale(0.97);
+      background: linear-gradient(145deg, #b0b0b0, #8c8c8c);
+    }
+
+    .side::after {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,255,0,0.4);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    input[type="password"] {
+      font-size: 24px;
+      text-align: center;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      width: 150px;
+      outline: none;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+  
+    <img src='Logo/hdfc-logo.png' alt='HDFC Logo'>
+    <h1><span>HDFC</span> Bank</h1>
+  </header>
+  <div class="leftside-button-container">
+    <a href="Deposit.html"><button class="side">Deposit</button></a>
+    <form action="MS" method="get"><button class="side">Mini Statement</button> </form>
+    <a href="ChangePin.html"><button class="side">Change Pin </button></a>
+  </div>
+  <div class="rightside-button-container">
+  <form action="CB" method="get"><button class="side">Check Balance</button></form> 
+   <a href="Withdraw.html">  <button class="side">Withdraw</button> </a>
+   <a href="GeneratePin.html" ><button class="side">Generate PIN</button></a>
+   <a href="TransferMoney.html"><button class="side">Transfer Money</button></a> 
+       
+  </div>
+</body>
+</html>

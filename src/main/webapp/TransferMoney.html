@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Transfer Money</title>
+    <style>
+        body {
+            background-image: url('https://wpblogassets.paytm.com/paytmblog/uploads/2021/07/ATM_8_WhatIsAnATMCardAndHowToUseIt-1-800x500.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 10;
+        }
+        header img {
+            width: 80px;
+            margin-right: 4px;
+        }
+        header h1 {
+            font-size: 48px;
+            color: #004C8F;
+            margin: 0;
+        }
+        header h1 span {
+            color: #E61C23;
+        }
+        .container {
+            margin-top: 140px;
+            background: rgba(0,0,0,0.6);
+            padding: 30px;
+            width: 400px;
+            border-radius: 15px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: none;
+        }
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background-color: #1632b4;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1a45e0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="Logo/hdfc-logo.png" width="120">
+    <h1><span>HDFC</span> Bank</h1>
+</header>
+
+<div class="container">
+    <h2>Transfer Money</h2>
+
+    <form action="TM" method="post">
+
+        <input type="text" name="receiver" placeholder="Receiver Account Number" required>
+        <input type="number" name="amount" placeholder="Enter Amount" required>
+        <input type="password" name="pinNo" placeholder="Enter Pword Number" required>
+
+        <button type="submit">Transfer</button>
+    </form>
+</div>
+
+</body>
+</html>
