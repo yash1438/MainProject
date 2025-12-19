@@ -3,32 +3,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HDFC NetBanking - Login</title>
-   <link rel="stylesheet" href="./Login.css">
- </head>
+  <title>YASH ATMService - Login</title>
+  <link rel="stylesheet" href="./Login.css">
+</head>
+
 <body>
-  <div class="header">HDFC Bank NetBanking</div>
+
+  <!-- HEADER -->
+  <div class="header">YASH Bank ATMService</div>
+
+  <!-- MAIN CONTENT -->
   <main>
-    <h1>HDFC Login Form</h1>
+    <h1>YASH Login Form</h1>
+
     <form method="post" action="login">
+
       <div class="form-group">
-        <label>User Name</label>
-        <input type="text" name="uname">
+        <label for="uname">User Name</label>
+        <input type="text" id="uname" name="uname" required>
       </div>
+
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" name="pword">
+        <label for="pword">Password</label>
+        <input type="password" id="pword" name="pword" required>
       </div>
-      <!-- Forgot Password Section -->
+
+      <!-- Forgot Password -->
       <div class="forgot-container">
         <a href="forgotpassword.html">Forgot Password?</a>
       </div>
+
+      <!-- Submit / Reset -->
       <div style="text-align:center;">
         <input type="submit" value="Submit">
         <input type="reset" value="Reset">
       </div>
+
+      <!-- ✅ Registration Option -->
+      <div class="register-container" style="text-align:center; margin-top:15px;">
+        Don’t have an account?
+        <a href="Registration.html"><strong>Create Account</strong></a>
+      </div>
+
     </form>
   </main>
-  <footer>© 2025 HDFC Bank Ltd. All Rights Reserved.</footer>
+
+  <!-- FOOTER -->
+  <footer>© 2025 YASH Bank Ltd. All Rights Reserved.</footer>
+
 </body>
 </html>

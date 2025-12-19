@@ -173,8 +173,7 @@ public class CBServlet extends HttpServlet {
             pw.println("<body>");
 
             pw.println("<header>");
-            pw.println("<img src='Logo/hdfc-logo.png' alt='HDFC Logo'>");
-            pw.println("<h1><span>HDFC</span> Bank</h1>");
+            pw.println("<h1><span>YASH</span> Bank</h1>");
             pw.println("</header>");
 
             if (rs.next()) {

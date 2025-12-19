@@ -91,6 +91,7 @@ public class LoginServlet extends HttpServlet {
 
             // 🔹 Store user in session
             HttpSession session = request.getSession();
+            System.out.println(session);
             session.setAttribute("user", ub);
 
             // 🔹 Mask account number
@@ -106,7 +107,7 @@ public class LoginServlet extends HttpServlet {
                     + "background: rgba(0,0,0,0.5); padding: 10px 15px; "
                     + "border-radius: 8px; color: red; font-size: 18px;'>");
 
-            pw.println("Welcome to HDFC: " + uname + "<br>");
+            pw.println("Welcome to YASH: " + uname + "<br>");
             pw.println("AccNo: " + maskedAcc + "<br>");
 
             pw.println("</div>");

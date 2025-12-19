@@ -72,8 +72,8 @@ public class WDServlet extends HttpServlet {
             pw.println("</style></head><body>");
 
             pw.println("<header>");
-            pw.println("<img src='Logo/hdfc-logo.png' alt='HDFC Logo'>");
-            pw.println("<h1><span>HDFC</span> Bank</h1>");
+           
+            pw.println("<h1><span>YASH </span> Bank</h1>");
             pw.println("</header>");
 
             con.setAutoCommit(false); // start transaction
