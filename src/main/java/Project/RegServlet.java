@@ -1,115 +1,90 @@
-//package Project;
-//
-//import java.io.IOException;
-//import java.io.PrintWriter;
-//import jakarta.servlet.RequestDispatcher;
-//import jakarta.servlet.ServletException;
-//import jakarta.servlet.annotation.WebServlet;
-//import jakarta.servlet.http.HttpServlet;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//
-//@WebServlet("/registration")
-//public class RegServlet extends HttpServlet {
-//    private static final long serialVersionUID = 1L;
-//
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        String fname = request.getParameter("fname");
-//        String lname = request.getParameter("lname");
-//        String uname = request.getParameter("uname");
-//        String pword = request.getParameter("pword");
-//        String gender = request.getParameter("gender");
-//        int balance = Integer.parseInt(request.getParameter("bal"));
-//          
-//        // Create user bean (no need to pass accNo, it will be generated)
-//        UserBean ub = new UserBean(fname,lname,uname,pword,balance);
-//
-//        PrintWriter pw = response.getWriter();
-//        response.setContentType("text/html");
-//
-//        int update = new HDFCDAOServlet().registerUser(ub);
-//System.out.println("UPDATE VALUE: "+update);
-//        pw.println("<html><body bgcolor='skyblue' text='white'><center><form>");
-//        if (update > 0) {
-//            pw.println("<h1>Registration Successful</h1>");
-//        } else {
-//            pw.println("<h1>Registration Failed</h1>");
-//        }
-//        pw.println("<a href='login.html'>Login</a></form></center></body></html>");
-//    }
-//}
 package Project;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.*;
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.*;
+import jakarta.servlet.http.*;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 
 @WebServlet("/registration")
 public class RegServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Retrieve form data
         String fname = request.getParameter("fname");
         String lname = request.getParameter("lname");
         String uname = request.getParameter("uname");
-        String aahno=request.getParameter("aahno");
+        String aahno = request.getParameter("aahno"); 
         String pword = request.getParameter("pword");
         String gender = request.getParameter("gender");
-        int balance = Integer.parseInt(request.getParameter("bal"));
-
-        // ✅ Create user bean with required details
-        UserBean ub = new UserBean(fname, lname, uname,aahno, pword, gender, balance);
-
-        PrintWriter pw = response.getWriter();
-        response.setContentType("text/html");
-
-        int update = new HDFCDAOServlet().registerUser(ub);
-        System.out.println("UPDATE VALUE: " + update);
-
-        pw.println("<html>");
-        pw.println("<head>");
-        pw.println("<style>");
-        pw.println("body {background-image: url('https://wpblogassets.paytm.com/paytmblog/uploads/2021/07/ATM_8_WhatIsAnATMCardAndHowToUseIt-1-800x500.jpg');background-size: cover;background-repeat: no-repeat; background-position: center;font-family: Arial, sans-serif; color: white;text-align: center;padding-top: 100px;"
-                + "}");
-        pw.println(".card {"
-                + "background: rgba(0,0,0,0.6);"
-                + "width: 450px;"
-                + "margin: auto;"
-                + "padding: 30px;"
-                + "border-radius: 15px;"
-                + "box-shadow: 0 0 15px rgba(255,255,255,0.4);"
-                + "}");
-       pw.println(".tick {font-size: 70px;color: #4CAF50;animation: pop 0.8s ease-out;}");
-        pw.println("@keyframes pop {0% { transform: scale(0); opacity: 0; }70% { transform: scale(1.2); opacity: 1; }100% { transform: scale(1); } }");
-        pw.println("a { display: inline-block; margin-top: 20px; padding: 10px 20px; background: #2196F3; color: white; text-decoration: none; font-size: 20px; border-radius: 8px;  transition: 0.3s; }");
-        pw.println("a:hover {background: #0b7dda; transform: scale(1.05);}");
-        pw.println("</style>");
-        pw.println("</head>");
-        pw.println("<body>");
-        pw.println("<div class='card'>");
-        if (update > 0) {
-            pw.println("<div class='tick'>✔</div>");
-            pw.println("<h1>Registration Successful!</h1>");
-            pw.println("<p>Your account has been created successfully.</p>");
-        } else {
-            pw.println("<div class='tick' style='color:red;'>✘</div>");
-            pw.println("<h1>Registration Failed</h1>");
-            pw.println("<p>There was an issue while creating your account.</p>");
+        String email = request.getParameter("email");
+        
+        // Handle potential NullPointerException if 'bal' is missing
+        int balance = 0;
+        if(request.getParameter("bal") != null) {
+            balance = Integer.parseInt(request.getParameter("bal"));
         }
 
-        pw.println("<a href='login.html'>Go to Login</a>");
+        UserBean ub = new UserBean(fname, lname, uname, aahno, pword, gender, balance, email);
+        int update = new HDFCDAOServlet().registerUser(ub);
 
-        pw.println("</div>");
-        pw.println("</body>");
-        pw.println("</html>");
+        response.setContentType("text/html");
+        PrintWriter pw = response.getWriter();
+        pw.println("<html><body style='text-align:center; background:#2c3e50; color:white; font-family:Arial; padding-top:50px;'>");
 
+        if (update > 0) {
+            pw.println("<div style='border:1px solid #27ae60; display:inline-block; padding:20px; border-radius:10px;'>");
+            pw.println("<h1>✔ Registration Successful!</h1>");
+            pw.println("<p>Account Number: <b>" + ub.getAccNo() + "</b></p>");
+            
+            try {
+                sendEmail(ub);
+                pw.println("<p style='color:#2ecc71;'>Welcome email sent successfully to: " + email + "</p>");
+            } catch (Exception e) {
+                pw.println("<p style='color:#e67e22;'>Registration saved, but Email failed.</p>");
+                pw.println("<small>Error: " + e.getMessage() + "</small>");
+                e.printStackTrace(); // This prints to the server console/logs
+            }
+            pw.println("</div>");
+        } else {
+            pw.println("<h1 style='color:#e74c3c;'>✘ Registration Failed</h1>");
+            pw.println("<p>Please check your details and try again.</p>");
+        }
+        
+        pw.println("<br><br><a href='login.html' style='color:cyan; text-decoration:none;'>Go to Login</a>");
+        pw.println("</body></html>");
     }
-}
+
+    private void sendEmail(UserBean ub) throws MessagingException {
+        final String sender = "balayaswanthkumarv@gmail.com"; 
+        final String appPwd = "rpvwfwwwsmkzpebl"; 
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.starttls.required", "true"); // Forces TLS
+        
+        // This helps fix the 'socket to TLS' conversion error
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender, appPwd);
+            }
+        });
+
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(sender));
+        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(ub.getEmail()));
+        msg.setSubject("YASH Bank - Registration Success");
+        msg.setText("Hi " + ub.getFname() + ",\nAcc No: " + ub.getAccNo() + "\nRegistration is successful!");
+
+        Transport.send(msg);
+    }
+    }

@@ -160,7 +160,7 @@ public class DepositServlet extends HttpServlet {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "1438");
+                    "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "143812");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -206,7 +206,7 @@ public class DepositServlet extends HttpServlet {
 
             if (session == null || session.getAttribute("user") == null) {
                 pw.println("<h3 style='color:red; text-align:center;'>Session expired. Login again.</h3>");
-                RequestDispatcher rd = request.getRequestDispatcher("login.html");
+                RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
                 rd.include(request, response);
                 return;
             }
@@ -254,13 +254,13 @@ public class DepositServlet extends HttpServlet {
 		    
 		  ptmt.executeUpdate();
            //     pw.println("<h1>₹" + depositAmount + " Deposited Successfully!</h1>");
-                RequestDispatcher rs = request.getRequestDispatcher("ATMScreen.html");
+                RequestDispatcher rs = request.getRequestDispatcher("login.html");
                 rs.include(request, response);
             } 
             
          } catch (NumberFormatException e) {
             pw.println("<h3 style='color:red; text-align:center;'>⚠ Invalid deposit amount!</h3>");
-            RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
+            RequestDispatcher rd = request.getRequestDispatcher("login.html");
             rd.include(request, response);
             
         } catch (SQLException e) {

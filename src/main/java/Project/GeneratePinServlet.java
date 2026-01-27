@@ -37,7 +37,7 @@ public class GeneratePinServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:Xe","yaswanth","1438");
+			con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:Xe","yaswanth","143812");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -70,11 +70,11 @@ public class GeneratePinServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 			PrintWriter pw=response.getWriter();
 			if(true) {
-				RequestDispatcher rd=request.getRequestDispatcher("ATMScreen.Html");
+				RequestDispatcher rd=request.getRequestDispatcher("login.html");
 				rd.forward(request, response);
 			}
 			else {
-				RequestDispatcher rd=request.getRequestDispatcher("ATMScreen.html");
+				RequestDispatcher rd=request.getRequestDispatcher("login.html");
 				rd.forward(request, response);
 			}
 			 

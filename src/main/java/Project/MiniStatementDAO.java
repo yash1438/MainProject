@@ -14,7 +14,7 @@ public class MiniStatementDAO {
 	{
 		  try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			     con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "1438");
+			     con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "143812");
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

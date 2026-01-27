@@ -31,7 +31,7 @@ public class CPServlet extends HttpServlet {
 			con = DriverManager.getConnection(
 				"jdbc:oracle:thin:@localhost:1521:XE",
 				"yaswanth",
-				"1438"
+				"143812"
 			);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -52,7 +52,7 @@ public class CPServlet extends HttpServlet {
 
 			if (session == null || session.getAttribute("user") == null) {
 				pw.println("<h3 style='color:red;'>Session Expired. Please login again.</h3>");
-				RequestDispatcher rd = request.getRequestDispatcher("login.html");
+				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
 				rd.include(request, response);
 				return;
 			}

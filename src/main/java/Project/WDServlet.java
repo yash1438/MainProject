@@ -28,7 +28,7 @@ public class WDServlet extends HttpServlet {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "1438"
+                "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "143812"
             );
         } catch (Exception e) {
             e.printStackTrace();

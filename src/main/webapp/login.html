@@ -4,7 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>YASH ATMService - Login</title>
+
+  <!-- Your CSS -->
   <link rel="stylesheet" href="./Login.css">
+
+  <!-- 🔴 Popup Style -->
+  <style>
+    #errorPopup {
+      display: none;
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 25px 35px;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(0,0,0,0.6);
+      text-align: center;
+      z-index: 9999;
+    }
+
+    #errorPopup h3 {
+      color: red;
+      margin-bottom: 15px;
+    }
+
+    #errorPopup button {
+      padding: 8px 25px;
+      border: none;
+      background: #0077cc;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+  </style>
+
+  <!-- 🔴 Popup Script -->
+  <script>
+    function showErrorPopup() {
+      document.getElementById("errorPopup").style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById("errorPopup").style.display = "none";
+    }
+  </script>
 </head>
 
 <body>
@@ -39,7 +84,7 @@
         <input type="reset" value="Reset">
       </div>
 
-      <!-- ✅ Registration Option -->
+      <!-- Register -->
       <div class="register-container" style="text-align:center; margin-top:15px;">
         Don’t have an account?
         <a href="Registration.html"><strong>Create Account</strong></a>
@@ -50,6 +95,12 @@
 
   <!-- FOOTER -->
   <footer>© 2025 YASH Bank Ltd. All Rights Reserved.</footer>
+
+  <!-- 🔴 ERROR POPUP -->
+  <div id="errorPopup">
+    <h3>Invalid Username / Password</h3>
+    <button onclick="closePopup()">OK</button>
+  </div>
 
 </body>
 </html>
