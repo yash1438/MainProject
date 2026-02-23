@@ -15,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class GPServlet
@@ -74,6 +75,8 @@ public class GPServlet extends HttpServlet {
 		String s2=request.getParameter("Cid");
 //		 System.out.println("pin="+s1);
 //		 System.out.println("cid="+s2);
+		HttpSession session = request.getSession(false);
+    	if(session!=null) {
 		PreparedStatement pstmt =con.prepareStatement("update hdfc_user_details set PINNO=? where cid=?");
 		pstmt.setString(1, s1);
 		pstmt.setString(2, s2);
@@ -94,6 +97,12 @@ public class GPServlet extends HttpServlet {
 		pw.println("Pin Generate Faild");
 		RequestDispatcher rd=request.getRequestDispatcher("ATMScreen.html");
 		rd.include(request, response);
+	}
+    	}
+   	else {
+		request.setAttribute("msg", "Session Expired");
+		request.getRequestDispatcher("Sessionexpiry.jsp").forward(request, response);
+		
 	}
 		//pw.println("</center></body></html>");
 	} catch (SQLException e) {

@@ -2,33 +2,30 @@ package Project;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletConfig;
-import jakarta.servlet.ServletException;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
 
 @WebServlet("/WD")
 public class WDServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     Connection con;
 
+    // ---------- DB CONNECTION ----------
     public void init(ServletConfig config) throws ServletException {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "143812"
+                    "jdbc:oracle:thin:@localhost:1521:xe",
+                    "yaswanth",
+                    "143812"
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,112 +34,153 @@ public class WDServlet extends HttpServlet {
 
     public void destroy() {
         try {
-            if (con != null) con.close();
-        } catch (SQLException e) {
+            if (con != null)
+                con.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // ---------- WITHDRAW LOGIC ----------
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         response.setContentType("text/html");
-        try (PrintWriter pw = response.getWriter()) {
+        PrintWriter pw = response.getWriter();
 
-            
-            String amtStr = request.getParameter("withdraw"); // amount to withdraw
-            int withdrawAmount = Integer.parseInt(amtStr);
+        try {
+            int withdrawAmount = Integer.parseInt(request.getParameter("withdraw"));
 
-            pw.println("<html><head><title>Withdraw</title>");
-            pw.println("<style>");
-            pw.println("body {background-image: url('https://wpblogassets.paytm.com/paytmblog/uploads/2021/07/ATM_8_WhatIsAnATMCardAndHowToUseIt-1-800x500.jpg');"
-                    + "background-size: cover;"
-                    + "background-repeat: no-repeat;"
-                    + "text-align: center;"
-                    + "color: white;"
-                    + "font-family: 'Segoe UI', sans-serif;}");
-            pw.println("header {display: flex; align-items: center; justify-content: center; padding: 20px;}");
-            pw.println("header img { width: 100px; height: auto; margin-right: 10px; }");
-            pw.println("header h1 { font-size: 48px; margin: 0; color: white; }");
-            pw.println("header h1 span { color: #E61C23; }");
-            pw.println(".balance { color: #ff1493; font-size: 30px; margin-top: 50px; font-weight: bold; }");
-            pw.println("h3 { color: red; margin-top: 40px; }");
-            pw.println("button {padding: 10px 20px; border-radius: 8px; border: none; background-color: #1632b4; color: white; font-size: 16px; cursor: pointer;}");
-            pw.println("button:hover { background-color: #1f4bda; }");
-            pw.println("</style></head><body>");
-
-            pw.println("<header>");
-           
-            pw.println("<h1><span>YASH </span> Bank</h1>");
-            pw.println("</header>");
-
-            con.setAutoCommit(false); // start transaction
             HttpSession hs = request.getSession(false);
-            UserBean ub= (UserBean) hs.getAttribute("user");
-            PreparedStatement psCheck = con.prepareStatement(
-                    "SELECT BALANCE FROM HDFC WHERE ACCNO = ?");
-            psCheck.setLong(1, ub.getAccNo());
-            ResultSet rs = psCheck.executeQuery();
+            UserBean ub = (UserBean) hs.getAttribute("user");
+
+            con.setAutoCommit(false);
+
+            // Check Balance
+            PreparedStatement ps = con.prepareStatement(
+                    "SELECT BALANCE FROM HDFC WHERE ACCNO=?");
+            ps.setLong(1, ub.getAccNo());
+            ResultSet rs = ps.executeQuery();
+
+            pw.println("<html><body style='text-align:center;font-family:Arial;'>");
+//            pw.println("<h1>YASH Bank</h1>");
 
             if (rs.next()) {
                 int balance = rs.getInt("BALANCE");
 
                 if (balance >= withdrawAmount) {
+
                     int newBalance = balance - withdrawAmount;
 
-                    PreparedStatement psUpdate = con.prepareStatement(
-                            "UPDATE HDFC SET BALANCE = ? WHERE ACCNO = ?");
-                    psUpdate.setInt(1, newBalance);
-                    psUpdate.setLong(2, ub.getAccNo());
+                    // Update Balance
+                    PreparedStatement ps2 = con.prepareStatement(
+                            "UPDATE HDFC SET BALANCE=? WHERE ACCNO=?");
+                    ps2.setInt(1, newBalance);
+                    ps2.setLong(2, ub.getAccNo());
 
-                    int updated = psUpdate.executeUpdate();
+                    int updated = ps2.executeUpdate();
 
                     if (updated > 0) {
-                        con.commit(); // success
-                        PreparedStatement ptmt = con.prepareStatement(
-       		                 "Insert into  MINIStatement values(?,?,?,?,?)");
-                 	   ptmt.setString(1, ""+ub.getAccNo());
-       		       ptmt.setString(2, "-");
-       		       ptmt.setString(3,"withdraw" );
-       		       ptmt.setString(4, ""+ withdrawAmount);
-       		       LocalDateTime now = LocalDateTime.now();
-       			     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-       			     String format = now.format(dtf);
-       		      ptmt.setString(5,format);
-       		      
-       		    
-       		  ptmt.executeUpdate();
-                        //pw.println("<div class='balance'>Withdrawal Successful! ₹" + withdrawAmount + " withdrawn.</div>");
-                       // pw.println("<div class='balance'>New Balance: ₹" + newBalance + "</div>");
-                        
+
+                        // Date & Time
+                        LocalDateTime now = LocalDateTime.now();
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                        String dateTime = now.format(dtf);
+
+                        // Insert Mini Statement
+                        PreparedStatement ps3 = con.prepareStatement(
+                                "INSERT INTO MINISTATEMENT VALUES(?,?,?,?,?)");
+                        ps3.setString(1, String.valueOf(ub.getAccNo()));
+                        ps3.setString(2, "-");
+                        ps3.setString(3, "Withdraw");
+                        ps3.setString(4, String.valueOf(withdrawAmount));
+                        ps3.setString(5, dateTime);
+                        ps3.executeUpdate();
+
+                        con.commit();
+
+//                        pw.println("<h2 style='color:green;'>Withdrawal Successful</h2>");
+//                        pw.println("<h3>Amount: ₹" + withdrawAmount + "</h3>");
+//                        pw.println("<h3>Available Balance: ₹" + newBalance + "</h3>");
+
+                        // ---------- SEND EMAIL ----------
+                        try {
+                            sendEmail(ub, withdrawAmount, newBalance, dateTime);
+                        } catch (Exception mailEx) {
+                            mailEx.printStackTrace();
+                        }
+
                     } else {
-                        con.rollback(); // failed update
-                        pw.println("<h3>Transaction failed! Please try again.</h3>");
+                        con.rollback();
+                        pw.println("<h3 style='color:red;'>Transaction Failed</h3>");
                     }
+
                 } else {
-                    pw.println("<h3>Insufficient Balance! Withdrawal Denied.</h3>");
+                    pw.println("<h3 style='color:red;'>Insufficient Balance</h3>");
                 }
+
             } else {
-                pw.println("<h3>Invalid Account Number!</h3>");
-              
+                pw.println("<h3 style='color:red;'>Invalid Account</h3>");
             }
 
             pw.println("</body></html>");
+
             RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
             rd.include(request, response);
+
         } catch (Exception e) {
             e.printStackTrace();
             try {
-                con.rollback(); // rollback if any exception
-            } catch (SQLException ex) {
-                ex.printStackTrace();
+                con.rollback();
+            } catch (Exception ex) {
             }
         } finally {
             try {
-                con.setAutoCommit(true); // reset auto-commit
-            } catch (SQLException e) {
-                e.printStackTrace();
+                con.setAutoCommit(true);
+            } catch (Exception e) {
             }
         }
+    }
+
+    // ---------- EMAIL METHOD ----------
+    private void sendEmail(UserBean ub, int amount, int balance, String dateTime)
+            throws MessagingException {
+
+        final String sender = "balayaswanthkumarv@gmail.com";
+        final String appPwd = "rpvwfwwwsmkzpebl";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+
+        // IMPORTANT FIX
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender, appPwd);
+            }
+        });
+
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(sender));
+        msg.setRecipients(Message.RecipientType.TO,
+                InternetAddress.parse(ub.getEmail()));
+
+        msg.setSubject("YASH Bank Withdrawal Alert");
+
+        String text =
+                "Account No : " + ub.getAccNo() + "\n" +
+                "Transaction : Withdraw\n" +
+                "Amount : ₹" + amount + "\n" +
+                "Date & Time : " + dateTime + "\n" +
+                "Balance : ₹" + balance;
+
+        msg.setText(text);
+
+        Transport.send(msg);
     }
 }

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YASH ATMService - Registration</title>
-  
- <link rel="stylesheet" href="./Registration.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YASH ATMService - Registration</title>
+
+<link rel="stylesheet" href="Registration.css">
 </head>
 
 <body>
@@ -13,85 +13,116 @@
 <div class="header">YASH Bank ATMService</div>
 
 <main>
-  <h1>YASH Registration Form</h1>
+<h1>YASH Registration Form</h1>
 
-  <form method="post" action="registration">
+<form method="post" action="registration">
 
-    <div class="form-group">
-      <label>First Name</label>
-      <input type="text" name="fname">
-    </div>
+<div class="form-group">
+<label>First Name</label>
+<input type="text" name="fname" required>
+</div>
 
-    <div class="form-group">
-      <label>Last Name</label>
-      <input type="text" name="lname">
-    </div>
+<div class="form-group">
+<label>Last Name</label>
+<input type="text" name="lname" required>
+</div>
 
-    <div class="form-group">
-      <label>User Name</label>
-      <input type="text" name="uname">
-    </div>
+<div class="form-group">
+<label>User Name</label>
+<input type="text" name="uname" required>
+</div>
 
-    <div class="form-group">
-      <label>Aadhar No</label>
-      <input type="text" name="aahno">
-    </div>
-    <div class="form-group">
-      <label> Email</label>
-      <input type=text name="email">
-    </div>
+<div class="form-group">
+<label>Aadhar No</label>
+<input type="text" name="aahno" required>
+</div>
 
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" name="pword">
-    </div>
+<!-- Email + OTP -->
+<div class="form-group">
+<label>Email</label>
+<div class="email-otp-group">
+<input type="text" name="email" id="email" placeholder="Enter your email" required>
+<button type="button" onclick="sendOTP()">Send OTP</button>
+</div>
+</div>
+<div class="form-group">
+<label>Enter Email OTP</label>
+<input type="text" name="otp" required>
+</div>
 
-    <div class="form-group">
-      <label>Gender</label>
-      <div class="gender-group">
-        <input type="radio" name="gender" value="Male"> Male
-        <input type="radio" name="gender" value="Female"> Female
-      </div>
-    </div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" name="pword" required>
+</div>
 
-    <div class="form-group">
-      <label>Enter Captcha</label>
-      <div class="captcha-container">
-        <span id="captcha"></span>
-        <button type="button" class="refresh-btn" id="refreshCaptcha">&#x21bb;</button>
-      </div>
-      <br>
-      <input type="text" id="captchaInput">
-    </div>
+<div class="form-group">
+<label>Gender</label>
+<div class="gender-group">
+<input type="radio" name="gender" value="Male" required> Male
+<input type="radio" name="gender" value="Female"> Female
+</div>
+</div>
 
-    <div style="text-align:center;">
-      <input type="submit" value="Submit">
-      <input type="reset" value="Reset">
-    </div>
+<!-- Captcha -->
+<div class="form-group">
+<label>Enter Captcha</label>
+<div class="captcha-container">
+<span id="captcha"></span>
+<button type="button" class="refresh-btn" onclick="generateCaptcha()">↻</button>
+</div>
+<br>
+<input type="text" id="captchaInput" required>
+</div>
 
-    <input type="hidden" value="1000" name="bal">
-      <!-- ✅ Registration Option -->
-      <div class="register-container" style="text-align:center; margin-top:15px;">
-        You have already account?
-        <a href="login.html"><strong>Login Account</strong></a>
-      </div>
-  </form>
+<div style="text-align:center;">
+<input type="submit" value="Submit">
+<input type="reset" value="Reset">
+</div>
+
+<input type="hidden" name="bal" value="1000">
+
+</form>
 </main>
 
 <footer>© 2025 YASH Bank Ltd. All Rights Reserved.</footer>
 
-<script>
-  function generateCaptcha() {
-    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-    let captcha = "";
-    for (let i = 0; i < 6; i++)
-      captcha += chars.charAt(Math.floor(Math.random() * chars.length));
-    document.getElementById("captcha").textContent = captcha;
-  }
+ <script > 
+function generateCaptcha(){
+    const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    let captcha="";
+    for(let i=0;i<6;i++)
+        captcha+=chars.charAt(Math.floor(Math.random()*chars.length));
 
-  window.onload = generateCaptcha;
-  document.getElementById("refreshCaptcha").onclick = generateCaptcha;
+    document.getElementById("captcha").textContent=captcha;
+}
+
+window.onload = generateCaptcha;
+
+//Send OTP
+function sendOTP() {
+    var emailField = document.getElementById("email");
+
+    if (!emailField) {
+        alert("Email field not found");
+        return;
+    }
+
+    var email = emailField.value;
+
+    if (email === "") {
+        alert("Please enter email first");
+        return;
+    }
+
+    fetch("/Project/SendOTP?email=" + encodeURIComponent(email))
+    .then(response => response.text())
+    .then(data => alert(data))
+    .catch(error => {
+        console.error(error);
+        alert("Error sending OTP");
+    });
+}
+ 
 </script>
-
 </body>
 </html>

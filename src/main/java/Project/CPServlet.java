@@ -47,21 +47,23 @@ public class CPServlet extends HttpServlet {
 
 		String newPin = request.getParameter("PinNo");
 
+		HttpSession session1= request.getSession(false);
 		try {
-			HttpSession session = request.getSession(false);
+        	if(session1!=null) {
+			
 
-			if (session == null || session.getAttribute("user") == null) {
-				pw.println("<h3 style='color:red;'>Session Expired. Please login again.</h3>");
-				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
-				rd.include(request, response);
-				return;
-			}
+		
+//				pw.println("<h3 style='color:red;'>Session Expired. Please login again.</h3>");
+//				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
+//				rd.include(request, response);
+//				return;
+		
 
 			// ❗ Update PIN for ALL records (NO WHERE CONDITION)
 			PreparedStatement pstmt = con.prepareStatement(
 				"UPDATE hdfc_user_details SET pinno=? where AccountNo=?"
 			);
-            UserBean ub = (UserBean) session.getAttribute("user");
+            UserBean ub = (UserBean) session1.getAttribute("user");
 			pstmt.setString(1, newPin);
 			pstmt.setLong(2, ub.getAccNo());
 
@@ -76,9 +78,18 @@ public class CPServlet extends HttpServlet {
 				rd.include(request, response);
 			}
 
-		} catch (SQLException e) {
+		}
+		
+           	else {
+        		request.setAttribute("msg", "Session Expired");
+        		request.getRequestDispatcher("Sessionexpiry.jsp").forward(request, response);
+        		
+        	}
+		}
+        	catch (SQLException e) {
 			e.printStackTrace();
 			pw.println("Error: " + e.getMessage());
 		}
 	}
 }
+

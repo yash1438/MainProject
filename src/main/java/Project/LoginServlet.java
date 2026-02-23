@@ -43,13 +43,16 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession session = request.getSession(true);
         session.setAttribute("user", ub);
-
+        session.setMaxInactiveInterval(100);
+        request.setAttribute("session", session);
         long accNo = ub.getAccNo();
         String accStr = String.valueOf(accNo);
         String maskedAcc = "XXXXXX" + accStr.substring(accStr.length() - 4);
 
         RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
         rd.include(request, response);
+      
+      
 
         pw.println("<div style='position:absolute; top:20px; right:20px;"
                 + "background:rgba(0,0,0,0.6); padding:12px 18px;"
