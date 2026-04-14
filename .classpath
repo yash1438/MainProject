@@ -13,6 +13,11 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="C:/Users/balay/Downloads/jakarta.mail-2.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Oracle/jdbc/lib/ojdbc11_g.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Yaswanth/Downloads/jakarta.mail-2.0.2.jar"/>
+	<classpathentry kind="lib" path="C:/Oracle/jdbc/lib/ojdbc8_g.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Yaswanth/Downloads/jakarta.mail-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Yaswanth/Downloads/jakarta.activation-api-2.2.0-M1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Yaswanth/Downloads/itextpdf-5.5.13.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

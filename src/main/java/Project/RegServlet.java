@@ -1,7 +1,7 @@
 package Project;
 
 import java.io.*;
-import java.util.*;
+import java.util.Properties;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.*;
 import jakarta.servlet.http.*;
@@ -17,7 +17,6 @@ public class RegServlet extends HttpServlet {
         response.setContentType("text/html");
         PrintWriter pw = response.getWriter();
 
-        // -------- GET SESSION --------
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("otp") == null) {
@@ -25,7 +24,6 @@ public class RegServlet extends HttpServlet {
             return;
         }
 
-        // -------- GET FORM DATA --------
         String fname = request.getParameter("fname");
         String lname = request.getParameter("lname");
         String uname = request.getParameter("uname");
@@ -40,7 +38,6 @@ public class RegServlet extends HttpServlet {
             balance = Integer.parseInt(request.getParameter("bal"));
         }
 
-        // -------- OTP VALIDATION --------
         int sessionOtp = (int) session.getAttribute("otp");
         String sessionEmail = (String) session.getAttribute("otpEmail");
 
@@ -51,18 +48,18 @@ public class RegServlet extends HttpServlet {
             return;
         }
 
-        // OTP verified → remove from session
         session.removeAttribute("otp");
         session.removeAttribute("otpEmail");
 
-        // -------- SAVE USER --------
         UserBean ub = new UserBean(fname, lname, uname, aahno, pword, gender, balance, email);
+
         int update = new HDFCDAOServlet().registerUser(ub);
 
-        pw.println("<html><body style='text-align:center; background:#2c3e50; color:white; font-family:Arial; padding-top:50px;'>");
+        pw.println("<html><body style='text-align:center;background:#2c3e50;color:white;font-family:Arial;padding-top:50px;'>");
 
         if (update > 0) {
-            pw.println("<div style='border:1px solid #27ae60; display:inline-block; padding:20px; border-radius:10px;'>");
+
+            pw.println("<div style='border:1px solid #27ae60;padding:20px;border-radius:10px;'>");
             pw.println("<h1>✔ Registration Successful!</h1>");
             pw.println("<p>Account Number: <b>" + ub.getAccNo() + "</b></p>");
 
@@ -75,6 +72,7 @@ public class RegServlet extends HttpServlet {
             }
 
             pw.println("</div>");
+
         } else {
             pw.println("<h1 style='color:#e74c3c;'>✘ Registration Failed</h1>");
         }
@@ -83,7 +81,6 @@ public class RegServlet extends HttpServlet {
         pw.println("</body></html>");
     }
 
-    // -------- WELCOME EMAIL --------
     private void sendEmail(UserBean ub) throws MessagingException {
 
         final String sender = "balayaswanthkumarv@gmail.com";
@@ -94,8 +91,6 @@ public class RegServlet extends HttpServlet {
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
-        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         Session session = Session.getInstance(props, new Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
@@ -111,12 +106,17 @@ public class RegServlet extends HttpServlet {
         msg.setSubject("YASH Bank - Registration Success");
 
         msg.setText(
-                "Hi " + ub.getFname() + ",\n\n" +
-                "Your account has been created successfully.\n\n" +
-                "Account Number: " + ub.getAccNo() + "\n" +
-                "Password: " + ub.getPword() + "\n" +
-                "PIN: " + ub.getPinNo() + "\n\n" +
-                "Welcome to YASH Bank."
+                "Dear " + ub.getFname() + " " + ub.getLname() + ",\n\n" +
+                "Congratulations! Your YASH Bank account has been created successfully.\n\n" +
+                "Account Details:\n" +
+                "Account Number : " + ub.getAccNo() + "\n" +
+                "IFSC Code      : " + ub.getIfsc() + "\n" +
+                "Login Password : " + ub.getPword() + "\n" +
+                "ATM PIN        : " + ub.getPinNo() + "\n\n" +
+                "Please keep these details secure.\n\n" +
+                "Thank you for choosing YASH Bank.\n\n" +
+                "Regards,\n" +
+                "YASH Bank Team"
         );
 
         Transport.send(msg);

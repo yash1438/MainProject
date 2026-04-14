@@ -37,7 +37,7 @@ public class GeneratePinServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:Xe","yaswanth","143812");
+			con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:ORCL","system","Yash1438");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

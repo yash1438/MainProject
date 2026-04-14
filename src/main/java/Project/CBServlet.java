@@ -27,7 +27,7 @@ public class CBServlet extends HttpServlet {
         	
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                "jdbc:oracle:thin:@localhost:1521:xe", "yaswanth", "143812"
+                "jdbc:oracle:thin:@localhost:1521:ORCL", "system", "Yash1438"
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,7 +114,7 @@ public class CBServlet extends HttpServlet {
             }
             
             pw.println("<br><br><a href='ATMScreen.html'><button type='submit'>Exit</button></a>");
-            
+
             pw.println("</body></html>");
     	}
         	else {

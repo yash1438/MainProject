@@ -23,9 +23,9 @@ public class DepositServlet extends HttpServlet {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:xe",
-                    "yaswanth",
-                    "143812");
+                    "jdbc:oracle:thin:@localhost:1521:ORCL",
+                    "system",
+                    "Yash1438");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -101,18 +101,30 @@ public class DepositServlet extends HttpServlet {
 
                 // Date & Time
                 LocalDateTime now = LocalDateTime.now();
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                String dateTime = now.format(dtf);
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                timestamp.setNanos(now.getNano());
+            	
+            	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            	String dateTime = now.format(dtf);
+            	
 
                 // Insert Mini Statement
-                PreparedStatement ptmt = con.prepareStatement(
-                        "INSERT INTO MINISTATEMENT VALUES(?,?,?,?,?)");
-                ptmt.setString(1, "-");
-                ptmt.setString(2, String.valueOf(ub.getAccNo()));
-                ptmt.setString(3, "Deposit");
-                ptmt.setString(4, String.valueOf(depositAmount));
-                ptmt.setString(5, dateTime);
-                ptmt.executeUpdate();
+//                PreparedStatement ptmt = con.prepareStatement(
+//                        "INSERT INTO MINISTATEMENT VALUES(ministatement_seq.NEXTVAL,?,?,?,?)");
+//                ptmt.setString(1, "-");
+//                ptmt.setString(2, String.valueOf(ub.getAccNo()));
+//                ptmt.setString(3, "Deposit");
+//                ptmt.setString(4, String.valueOf(depositAmount));
+//                ptmt.setTimestamp(5, timestamp);
+//                ptmt.executeUpdate();
+            	PreparedStatement ptmt = con.prepareStatement(
+            		    "INSERT INTO MINISTATEMENT(TID, ACCNO, TRANTYPE, AMOUNT, TRANDATE) " +
+            		    "VALUES(ministatement_seq.NEXTVAL, ?, ?, ?, ?)");
+            		ptmt.setString(1, String.valueOf(ub.getAccNo()));  // ACCNO
+            		ptmt.setString(2, "Deposit");                      // TRANTYPE
+            		ptmt.setString(3, String.valueOf(depositAmount));  // AMOUNT
+            		ptmt.setTimestamp(4, timestamp);                   // TRANDATE
+            		ptmt.executeUpdate();
 
 //                pw.println("<h2 style='color:green;'>Deposit Successful</h2>");
 //                pw.println("<h3>Amount: ₹" + depositAmount + "</h3>");

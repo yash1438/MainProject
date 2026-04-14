@@ -6,7 +6,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Properties;
 
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -18,78 +23,131 @@ import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/CP")
 public class CPServlet extends HttpServlet {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	Connection con = null;
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		try {
-			Class.forName("oracle.jdbc.driver.OracleDriver");
-			con = DriverManager.getConnection(
-				"jdbc:oracle:thin:@localhost:1521:XE",
-				"yaswanth",
-				"143812"
-			);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    private static final long serialVersionUID = 1L;
+    Connection con = null;
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        try {
+            Class.forName("oracle.jdbc.driver.OracleDriver");
+            con = DriverManager.getConnection(
+                "jdbc:oracle:thin:@localhost:1521:ORCL", "system", "Yash1438"
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-		response.setContentType("text/html");
-		PrintWriter pw = response.getWriter();
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
-		String newPin = request.getParameter("PinNo");
+        response.setContentType("text/html");
+        PrintWriter pw = response.getWriter();
 
-		HttpSession session1= request.getSession(false);
-		try {
-        	if(session1!=null) {
-			
+        String newPin = request.getParameter("PinNo");
+        HttpSession session1 = request.getSession(false);
 
-		
-//				pw.println("<h3 style='color:red;'>Session Expired. Please login again.</h3>");
-//				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
-//				rd.include(request, response);
-//				return;
-		
+        try {
+            if (session1 != null) {
 
-			// ❗ Update PIN for ALL records (NO WHERE CONDITION)
-			PreparedStatement pstmt = con.prepareStatement(
-				"UPDATE hdfc_user_details SET pinno=? where AccountNo=?"
-			);
-            UserBean ub = (UserBean) session1.getAttribute("user");
-			pstmt.setString(1, newPin);
-			pstmt.setLong(2, ub.getAccNo());
+                UserBean ub = (UserBean) session1.getAttribute("user");
 
-			int k = pstmt.executeUpdate();
+                // -------- UPDATE PIN --------
+                PreparedStatement pstmt = con.prepareStatement(
+                    "UPDATE hdfc_user_details SET pinno=? WHERE AccountNo=?"
+                );
+                pstmt.setString(1, newPin);
+                pstmt.setLong(2, ub.getAccNo());
 
-			if (k > 0) {
-				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
-				rd.include(request, response);
-			} else {
-				pw.println("<h3 style='color:red;'>PIN Update Failed.</h3>");
-				RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
-				rd.include(request, response);
-			}
+                int k = pstmt.executeUpdate();
 
-		}
-		
-           	else {
-        		request.setAttribute("msg", "Session Expired");
-        		request.getRequestDispatcher("Sessionexpiry.jsp").forward(request, response);
-        		
-        	}
-		}
-        	catch (SQLException e) {
-			e.printStackTrace();
-			pw.println("Error: " + e.getMessage());
-		}
-	}
+                if (k > 0) {
+
+                    // -------- SEND EMAIL --------
+                    try {
+                        sendEmail(ub);
+                    } catch (Exception mailEx) {
+                        mailEx.printStackTrace(); // don't crash if email fails
+                    }
+
+                    RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
+                    rd.include(request, response);
+
+                } else {
+                    pw.println("<h3 style='color:red;'>PIN Update Failed.</h3>");
+                    RequestDispatcher rd = request.getRequestDispatcher("ATMScreen.html");
+                    rd.include(request, response);
+                }
+
+            } else {
+                request.setAttribute("msg", "Session Expired");
+                request.getRequestDispatcher("Sessionexpiry.jsp").forward(request, response);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            pw.println("Error: " + e.getMessage());
+        }
+    }
+
+    // -------- EMAIL METHOD --------
+    private void sendEmail(UserBean ub) throws MessagingException {
+
+        final String sender = "balayaswanthkumarv@gmail.com";
+        final String appPwd = "rpvwfwwwsmkzpebl";
+
+        Properties props = new Properties();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.ssl.protocols", "TLSv1.2");
+
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(sender, appPwd);
+            }
+        });
+
+        // Date & Time
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String dateTime = now.format(dtf);
+
+        Message msg = new MimeMessage(session);
+        msg.setFrom(new InternetAddress(sender));
+        msg.setRecipients(Message.RecipientType.TO,
+                InternetAddress.parse(ub.getEmail()));
+
+        msg.setSubject("YASH Bank - PIN Change Alert");
+
+        String text =
+                "Dear Customer,\n\n" +
+                "Your ATM PIN has been changed successfully.\n\n" +
+                "Transaction Details\n" +
+                "-----------------------------\n" +
+                "Account No  : " + ub.getAccNo() + "\n" +
+                "Action      : PIN Changed\n" +
+                "PIN No:"+ub.getPinNo()+
+                "Date & Time : " + dateTime + "\n" +
+                "-----------------------------\n\n" +
+                "If you did not request this change, " +
+                "please contact YASH Bank immediately.\n\n" +
+                "Thank you for banking with YASH Bank.";
+
+        msg.setText(text);
+        Transport.send(msg);
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            if (con != null) con.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
-

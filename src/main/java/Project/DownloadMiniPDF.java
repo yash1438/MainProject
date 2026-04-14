@@ -1,69 +1,4 @@
-//package Project;
-//
-//import java.io.IOException;
-//import java.util.List;
-//import jakarta.servlet.ServletException;
-//import jakarta.servlet.annotation.WebServlet;
-//import jakarta.servlet.http.HttpServlet;
-//import jakarta.servlet.http.HttpServletRequest;
-//import jakarta.servlet.http.HttpServletResponse;
-//import jakarta.servlet.http.HttpSession;
-//
-//import com.itextpdf.text.*;
-//import com.itextpdf.text.pdf.*;
-//
-//@WebServlet("/DownloadMiniPDF")
-//public class DownloadMiniPDF extends HttpServlet {
-//
-//    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-//            throws ServletException, IOException {
-//
-//        try {
-//            // Set response as PDF file
-//            response.setContentType("application/pdf");
-//            response.setHeader("Content-Disposition", "attachment; filename=ministatement.pdf");
-//
-//            Document document = new Document();
-//            PdfWriter.getInstance(document, response.getOutputStream());
-//            document.open();
-//
-//            // Title
-//            Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-//            Paragraph title = new Paragraph("Mini Statement", titleFont);
-//            title.setAlignment(Element.ALIGN_CENTER);
-//            title.setSpacingAfter(20);
-//            document.add(title);
-//        	HttpSession hs = request.getSession(false);
-//    		UserBean ub  =(UserBean) hs.getAttribute("user");
-//            // Fetch mini statement from DAO
-//            List<TranstrationBean> miniStatement = new MiniStatementDAO().getMiniStatement(ub.getAccNo());
-//
-//            // Table
-//            PdfPTable table = new PdfPTable(5);
-//            table.setWidthPercentage(100);
-//
-//            table.addCell("Sender");
-//            table.addCell("Receiver");
-//            table.addCell("Type");
-//            table.addCell("Amount");
-//            table.addCell("Date/Time");
-//
-//            for (TranstrationBean t : miniStatement) {
-//                table.addCell(t.getSenderaccountNo());
-//                table.addCell(t.getReceiveraccountNo());
-//                table.addCell(t.getTranstrationtype());
-//                table.addCell(String.valueOf(t.getTranstrationamount()));
-//                table.addCell(String.valueOf(t.getDate_time()));
-//            }
-//
-//            document.add(table);
-//            document.close();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
+ 
 package Project;
 
 import java.io.IOException;
@@ -93,9 +28,9 @@ public class DownloadMiniPDF extends HttpServlet {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:xe",
-                    "yaswanth",
-                    "143812");
+                    "jdbc:oracle:thin:@localhost:1521:ORCL",
+                    "system",
+                    "Yash1438");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -119,14 +54,12 @@ public class DownloadMiniPDF extends HttpServlet {
 
             // -------- FETCH MINI STATEMENT --------
             PreparedStatement ps = con.prepareStatement(
-                    "SELECT SENDERACCOUNTNO, RECEIVERACCOUNTNO, TRANSTRATIONTYPE, " +
-                    "TRANSTRATIONAMOUNT, DATE_TIME " +
+                    "SELECT ACCNO, TRANTYPE, AMOUNT, TRANDATE " +
                     "FROM MINISTATEMENT " +
-                    "WHERE SENDERACCOUNTNO=? OR RECEIVERACCOUNTNO=? " +
-                    "ORDER BY DATE_TIME DESC");
+                    "WHERE ACCNO = ? " +
+                    "ORDER BY TRANDATE DESC");
 
-            ps.setString(1, String.valueOf(accNo));
-            ps.setString(2, String.valueOf(accNo));
+            ps.setString(1, String.valueOf(accNo)); // only ONE param now
 
             ResultSet rs = ps.executeQuery();
 
@@ -146,40 +79,55 @@ public class DownloadMiniPDF extends HttpServlet {
             PdfWriter.getInstance(document, out);
             document.open();
 
-            document.add(new Paragraph("YASH Bank"));
-            document.add(new Paragraph("Mini Statement"));
-            document.add(new Paragraph("Account No: " + accNo));
+            // -------- PDF HEADER --------
+            Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
+            Font subFont  = new Font(Font.FontFamily.HELVETICA, 12, Font.NORMAL);
+
+            document.add(new Paragraph("YASH Bank", titleFont));
+            document.add(new Paragraph("Mini Statement", subFont));
+            document.add(new Paragraph("Account No: " + accNo, subFont));
             document.add(new Paragraph(" "));
 
-            PdfPTable table = new PdfPTable(5);
-            table.addCell("Sender");
-            table.addCell("Receiver");
-            table.addCell("Type");
-            table.addCell("Amount");
-            table.addCell("Date/Time");
+            // -------- PDF TABLE — 4 columns now --------
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+
+            // Table Headers
+            table.addCell(new PdfPCell(new Phrase("Account No")));
+            table.addCell(new PdfPCell(new Phrase("Type")));
+            table.addCell(new PdfPCell(new Phrase("Amount")));
+            table.addCell(new PdfPCell(new Phrase("Date / Time")));
+
+            boolean hasData = false;
 
             while (rs.next()) {
+                hasData = true;
 
-                String sender = rs.getString("SENDERACCOUNTNO");
-                String receiver = rs.getString("RECEIVERACCOUNTNO");
-                String type = rs.getString("TRANSTRATIONTYPE");
-                String amount = rs.getString("TRANSTRATIONAMOUNT");
-                String date = rs.getString("DATE_TIME");
+                String accno  = rs.getString("ACCNO");
+                String type   = rs.getString("TRANTYPE");
+                String amount = rs.getString("AMOUNT");
+                String date   = rs.getString("TRANDATE");
 
                 // Add to PDF
-                table.addCell(sender);
-                table.addCell(receiver);
-                table.addCell(type);
-                table.addCell(amount);
-                table.addCell(date);
+                table.addCell(accno  != null ? accno  : "-");
+                table.addCell(type   != null ? type   : "-");
+                table.addCell(amount != null ? "Rs." + amount : "-"); // ₹ may not render in PDF font
+                table.addCell(date   != null ? date   : "-");
 
                 // Add to email text
                 mailData.append(type)
-                        .append("  ₹")
+                        .append("  Rs.")
                         .append(amount)
                         .append("  ")
                         .append(date)
                         .append("\n");
+            }
+
+            if (!hasData) {
+                mailData.append("No transactions found.\n");
+                PdfPCell noData = new PdfPCell(new Phrase("No transactions found."));
+                noData.setColspan(4);
+                table.addCell(noData);
             }
 
             document.add(table);
@@ -205,8 +153,6 @@ public class DownloadMiniPDF extends HttpServlet {
         props.put("mail.smtp.port", "587");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
-
-        // SSL Fix
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
         props.put("mail.smtp.ssl.protocols", "TLSv1.2");
 
@@ -216,25 +162,23 @@ public class DownloadMiniPDF extends HttpServlet {
             }
         });
 
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         Message msg = new MimeMessage(session);
         msg.setFrom(new InternetAddress(senderEmail));
         msg.setRecipients(Message.RecipientType.TO,
                 InternetAddress.parse(ub.getEmail()));
-
         msg.setSubject("YASH Bank Mini Statement");
-
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         String messageText =
                 "Dear Customer,\n\n" +
-                "Account No: " + ub.getAccNo() + "\n" +
+                "Account No  : " + ub.getAccNo() + "\n" +
                 "Generated On: " + now.format(dtf) + "\n\n" +
                 data +
                 "\nThank you for banking with YASH Bank.";
 
         msg.setText(messageText);
-
         Transport.send(msg);
     }
 

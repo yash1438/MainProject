@@ -23,9 +23,9 @@ public class WDServlet extends HttpServlet {
         try {
             Class.forName("oracle.jdbc.driver.OracleDriver");
             con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:xe",
-                    "yaswanth",
-                    "143812"
+                    "jdbc:oracle:thin:@localhost:1521:ORCL",
+                    "system",
+                    "Yash1438"
             );
         } catch (Exception e) {
             e.printStackTrace();
@@ -83,21 +83,32 @@ public class WDServlet extends HttpServlet {
                     if (updated > 0) {
 
                         // Date & Time
-                        LocalDateTime now = LocalDateTime.now();
-                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                        String dateTime = now.format(dtf);
+                    	LocalDateTime now = LocalDateTime.now();
+                    	Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    	timestamp.setNanos(now.getNano());
+                    	
+                    	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    	String dateTime = now.format(dtf);
+                    	
 
                         // Insert Mini Statement
-                        PreparedStatement ps3 = con.prepareStatement(
-                                "INSERT INTO MINISTATEMENT VALUES(?,?,?,?,?)");
-                        ps3.setString(1, String.valueOf(ub.getAccNo()));
-                        ps3.setString(2, "-");
-                        ps3.setString(3, "Withdraw");
-                        ps3.setString(4, String.valueOf(withdrawAmount));
-                        ps3.setString(5, dateTime);
-                        ps3.executeUpdate();
-
-                        con.commit();
+//                        PreparedStatement ps3 = con.prepareStatement(
+//                                "INSERT INTO MINISTATEMENT VALUES(?,ministatement_seq.NEXTVAL,?,?,?)");
+//                        ps3.setString(1, String.valueOf(ub.getAccNo()));
+//                        ps3.setString(2, "-");
+//                        ps3.setString(3, "Withdraw");
+//                        ps3.setString(4, String.valueOf(withdrawAmount));
+//                        ps3.setTimestamp(5, timestamp);
+//                        ps3.executeUpdate();
+//                        con.commit();
+                    	PreparedStatement ps3 = con.prepareStatement(
+                    		    "INSERT INTO MINISTATEMENT(TID, ACCNO, TRANTYPE, AMOUNT, TRANDATE) " +
+                    		    "VALUES(ministatement_seq.NEXTVAL, ?, ?, ?, ?)");
+                    		ps3.setString(1, String.valueOf(ub.getAccNo()));   // ACCNO
+                    		ps3.setString(2, "Withdraw");                      // TRANTYPE
+                    		ps3.setString(3, String.valueOf(withdrawAmount));  // AMOUNT
+                    		ps3.setTimestamp(4, timestamp);                    // TRANDATE
+                    		ps3.executeUpdate();
 
 //                        pw.println("<h2 style='color:green;'>Withdrawal Successful</h2>");
 //                        pw.println("<h3>Amount: ₹" + withdrawAmount + "</h3>");
